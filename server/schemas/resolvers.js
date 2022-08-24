@@ -31,17 +31,30 @@ const resolvers = {
       const token = signToken(user);
       return { token, user };
       },
-      
     
-    createVote: async (parent, { _id, techNum }) => {
-      const vote = await Matchup.findOneAndUpdate(
-        { _id },
-        { $inc: { [`tech${techNum}_votes`]: 1 } },
-        { new: true }
-      );
-      return vote;
+      saveBook: async (parent, { bookData }, context) => {
+
+        if(context.user) {
+          return User.findOneAndUpdate(
+            { _id: userId },
+            { $push: { savedBooks: { bookData } } },
+            { new: true }
+          );
+        }
+        throw new AuthenticationError('Please log in!');
+      },
+    
+      removeBook: async(parent, { bookData }, context) => {
+        if(context.user) {
+        return User.findOneAndUpdate(
+          { _id: userId },
+          { $pull: { savedBooks: { bookData } } },
+          { new: true }
+        );
+      }
+      throw new AuthenticationError('Please log in!');
     },
-  },
+    },
 };
 
 module.exports = resolvers;
