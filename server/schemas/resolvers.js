@@ -1,20 +1,26 @@
-const { Tech, Matchup } = require('../models');
+const { User } = require('../models');
+const { signToken } = require('../utils/auth')
 
 const resolvers = {
   Query: {
-    tech: async () => {
-      return Tech.find({});
-    },
-    matchups: async (parent, { _id }) => {
-      const params = _id ? { _id } : {};
-      return Matchup.find(params);
+    me: async () => {
+      return User.find({});
     },
   },
   Mutation: {
-    createMatchup: async (parent, args, context) => {
+    addUser: async (parent, args) => {
+      const user = await User.create(args);
+      const token = signToken(user);
+
+      return { token, user };
+    },
+    login: async (parent, { email, password }, context) => {
+      const user = await User.finOne({ email });
+      if (!user) {
+        throw new AuthentiacationError('No user found with this email address')
+      }
       if(context.user) {
 
-      
       const matchup = await Matchup.create(args);
       return matchup;
       }
