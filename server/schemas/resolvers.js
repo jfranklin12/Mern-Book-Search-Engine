@@ -1,3 +1,4 @@
+const { AuthenticationError } = require('apollo-server-express')
 const { User } = require('../models');
 const { signToken } = require('../utils/auth')
 
@@ -14,19 +15,24 @@ const resolvers = {
 
       return { token, user };
     },
-    login: async (parent, { email, password }, context) => {
+    login: async (parent, { email, password }) => {
       const user = await User.finOne({ email });
+
       if (!user) {
         throw new AuthentiacationError('No user found with this email address')
       }
-      if(context.user) {
 
-      const matchup = await Matchup.create(args);
-      return matchup;
+      const correctPw = await user.isCorrectPassword(password);
+      
+      if(!correctPw) {
+        throw new AuthenticationError('Incorrect password!')
       }
-      // you still need to import appolo
-      throw new AuthenticationError('There was problem with login');
-    },
+
+      const token = signToken(user);
+      return { token, user };
+      },
+      
+    
     createVote: async (parent, { _id, techNum }) => {
       const vote = await Matchup.findOneAndUpdate(
         { _id },
