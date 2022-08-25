@@ -16,7 +16,7 @@ const resolvers = {
       return { token, user };
     },
     login: async (parent, { email, password }) => {
-      const user = await User.finOne({ email });
+      const user = await User.findOne({ email });
 
       if (!user) {
         throw new AuthentiacationError('No user found with this email address')
