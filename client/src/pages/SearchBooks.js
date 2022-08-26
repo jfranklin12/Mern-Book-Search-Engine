@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Jumbotron, Container, Col, Form, Button, Card, CardColumns } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
-import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+// import { saveBook, searchGoogleBooks } from '../utils/API';
 
+import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutation';
 
@@ -36,7 +36,8 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await searchGoogleBooks(searchInput);
+      const response = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=${searchInput}`);
 
       if (!response.ok) {
         throw new Error('something went wrong!');
@@ -74,7 +75,7 @@ const SearchBooks = () => {
     try {
       console.log(bookToSave)
       const { data } = await saveBook({
-        variables: { bookData: bookToSave }
+        variables: { bookData: { ...bookToSave } }
       })
       // const response = await saveBook(bookToSave, token);
 
